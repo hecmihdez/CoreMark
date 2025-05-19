@@ -10,6 +10,7 @@
 #include "fsl_debug_console.h"
 #include "board.h"
 #include "app.h"
+#include "coremark_helper.h"
 
 /*******************************************************************************
  * Definitions
@@ -22,7 +23,7 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-
+signed short total_errors = 0;
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -36,11 +37,22 @@ int main(void)
     /* Init board hardware. */
     BOARD_InitHardware();
 
-    PRINTF("hello world.\r\n");
+    PRINTF("MCXA153 Coremark.");
 
-    while (1)
-    {
-        ch = GETCHAR();
-        PUTCHAR(ch);
-    }
+//    while (1)
+//    {
+//        ch = GETCHAR();
+//        PUTCHAR(ch);
+
+//        CMHELPER_RunCoremark();
+//    }
+        while(1)
+        {
+
+        	CMHELPER_RunCoremark();
+
+        	PRINTF("LISTO\r\n");
+        	ch = GETCHAR();
+			PUTCHAR(ch);
+        }
 }

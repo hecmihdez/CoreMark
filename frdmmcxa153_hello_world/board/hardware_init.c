@@ -15,7 +15,9 @@
 /*${function:start}*/
 void BOARD_InitHardware(void)
 {
-    BOARD_InitPins();
+	CLOCK_AttachClk(kCLK_1M_to_OSTIMER);
+
+	BOARD_InitPins();
     BOARD_InitBootClocks();
     BOARD_InitDebugConsole();
 }
