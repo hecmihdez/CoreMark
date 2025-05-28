@@ -25,7 +25,7 @@
 /*******************************************************************************
 * Local Prototypes
 *******************************************************************************/
-extern void coremark_main(void);
+extern void coremark_main(RESULTS_FLASH* test_results);
 
 #if (defined(POWER_MEASURE_EN) && (POWER_MEASURE_EN==0))
 static void CMHELPER_TimerInit(void);
@@ -54,7 +54,7 @@ void SystemPerfMonInit(void)
 }
 
 
-void CMHELPER_RunCoremark(void) {    
+void CMHELPER_RunCoremark(RESULTS_FLASH* test_results) {
 
       /* Core Mark Info */
       CMHELPER_PrintDebugInfo();
@@ -63,7 +63,7 @@ void CMHELPER_RunCoremark(void) {
         /* Start timer for coremark */
         CMHELPER_TimerInit();
 #endif  // (POWER_MEASURE_EN==0)
-        coremark_main();
+        coremark_main(test_results);
 
 }
 

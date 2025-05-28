@@ -20,6 +20,7 @@ El Dorado Hills, CA, 95762
 	This file contains the framework to acquire a block of memory, seed initial parameters, tun t he benchmark and report the results.
 */
 #include "coremark.h"
+#include "coremark_helper.h"
 #include "board.h"
 
 extern signed short total_errors;
@@ -88,7 +89,7 @@ char *mem_name[3] = {"Static","Heap","Stack"};
 
 */
 
-MAIN_RETURN_TYPE coremark_main(void) {
+MAIN_RETURN_TYPE coremark_main(RESULTS_FLASH* test_results) {
 	int argc=0;
 	char *argv[1];
 
@@ -295,15 +296,19 @@ MAIN_RETURN_TYPE coremark_main(void) {
 	total_errors+=check_data_types();
 	/* and report results */
 	ee_printf("CoreMark Size    : %d\n\r",(ee_u32)results[0].size);
+	test_results->CoreMarkSize = (ee_u32)results[0].size;
 	ee_printf("Total ticks      : %d\n\r",(ee_u32)total_time);
+	test_results->TotalTicks = (ee_u32)total_time;
 #if HAS_FLOAT
 	ee_printf("Total time (secs): %f\n\r",time_in_secs(total_time));
 	if (time_in_secs(total_time) > 0)
 		ee_printf("Iterations/Sec   : %f\n\r",default_num_contexts*results[0].iterations/time_in_secs(total_time));
 #else
 	ee_printf("Total time (secs): %d\n\r",time_in_secs(total_time));
+	test_results->TotalTime = time_in_secs(total_time);
 	if (time_in_secs(total_time) > 0)
 		ee_printf("Iterations/Sec   : %d\n\r",default_num_contexts*results[0].iterations/time_in_secs(total_time));
+		test_results->IterationsPerSec = default_num_contexts*results[0].iterations/time_in_secs(total_time);
 #endif
 	if (time_in_secs(total_time) < 10) {
 		ee_printf("ERROR! Must execute for at least 10 secs for a valid result!\n\r");
@@ -311,6 +316,7 @@ MAIN_RETURN_TYPE coremark_main(void) {
 	}
 
 	ee_printf("Iterations       : %d\n\r",(ee_u32)default_num_contexts*results[0].iterations);
+	test_results->Iterations = (ee_u32)default_num_contexts*results[0].iterations;
 	ee_printf("Compiler version : %s\n\r",COMPILER_VERSION);
 	ee_printf("Compiler flags   : %s\n\r",COMPILER_FLAGS);
 #if (MULTITHREAD>1)
@@ -319,17 +325,40 @@ MAIN_RETURN_TYPE coremark_main(void) {
 	ee_printf("Memory location  : %s\n\r",MEM_LOCATION);
 	/* output for verification */
 	ee_printf("seedcrc          : 0x%04x\n\r",seedcrc);
+	test_results->SeedCrc = seedcrc;
 	if (results[0].execs & ID_LIST)
+	{
 		for (i=0 ; i<default_num_contexts; i++)
+		{
 			ee_printf("[%d]crclist       : 0x%04x\n\r",i,results[i].crclist);
+			test_results->CrcList = results[i].crclist;
+		}
+	}
+
 	if (results[0].execs & ID_MATRIX)
+	{
 		for (i=0 ; i<default_num_contexts; i++)
+		{
 			ee_printf("[%d]crcmatrix     : 0x%04x\n\r",i,results[i].crcmatrix);
+			test_results->CrcMatrix = results[i].crcmatrix;
+		}
+	}
+
 	if (results[0].execs & ID_STATE)
+	{
 		for (i=0 ; i<default_num_contexts; i++)
+		{
 			ee_printf("[%d]crcstate      : 0x%04x\n\r",i,results[i].crcstate);
+			test_results->CrcState = results[i].crcstate;
+		}
+	}
+
 	for (i=0 ; i<default_num_contexts; i++)
+	{
 		ee_printf("[%d]crcfinal      : 0x%04x\n\r",i,results[i].crc);
+		test_results->CrcFinal = results[i].crc;
+	}
+
 	if (total_errors==0) {
 		ee_printf("Correct operation validated. See readme.txt for run and reporting rules.\n\r");
 #if HAS_FLOAT
@@ -355,6 +384,8 @@ MAIN_RETURN_TYPE coremark_main(void) {
 	if (total_errors<0)
 		ee_printf("Cannot validate operation for these seed values, please compare with results on a known platform.\n\r");
 
+	test_results->NumErrors = (uint16_t)total_errors;
+
 #if (MEM_METHOD==MEM_MALLOC)
 	for (i=0 ; i<MULTITHREAD; i++)
 		portable_free(results[i].memblock[0]);
@@ -365,5 +396,4 @@ MAIN_RETURN_TYPE coremark_main(void) {
         ee_printf("Coremark execution compleded! \n\r");
       
         return MAIN_RETURN_VAL;	
-        
 }
