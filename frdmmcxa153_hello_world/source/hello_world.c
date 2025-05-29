@@ -20,7 +20,11 @@
  ******************************************************************************/
 #define DEMO_LPTMR_BASE    LPTMR0
 #define DEMO_LPTMR_IRQn    LPTMR0_IRQn
-#define LPTMR_LED_HANDLER  LPTMR0_IRQHandler
+#define LPTMR_TIMER_HANDLER  LPTMR0_IRQHandler
+
+#define EXECUTION_TIME_PERIOD	(0x003C)
+
+#define CLEAN_MEMORY	(0)
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -30,26 +34,16 @@
  ******************************************************************************/
 signed short total_errors = 0;
 RESULTS_FLASH CoreMark_Results = {"**START*",0,0,0,0,0,0,0,0,0,0,0,0,"END*"};
-//volatile uint32_t lptmrCounter = 0U;
 bool CoreMark_RUN = false;
 int8_t saveFlag = 0;
 /*******************************************************************************
  * Code
  ******************************************************************************/
 
-void LPTMR_LED_HANDLER(void)
+void LPTMR_TIMER_HANDLER(void)
 {
     LPTMR_ClearStatusFlags(DEMO_LPTMR_BASE, kLPTMR_TimerCompareFlag);
     CoreMark_RUN = true;
-//    lptmrCounter++;
-//    LED_TOGGLE();
-    /*
-     * Workaround for TWR-KV58: because write buffer is enabled, adding
-     * memory barrier instructions to make sure clearing interrupt flag completed
-     * before go out ISR
-     */
-    __DSB();
-    __ISB();
 }
 
 
@@ -64,9 +58,13 @@ int main(void)
     /* Init board hardware. */
     BOARD_InitHardware();
 
-    temperature_init();
-
     FlashData_vInit();
+#if CLEAN_MEMORY
+    FlashData_vEraseSector();
+    while(1);
+#else
+
+    temperature_init();
 
     PRINTF("MCXA153 Coremark.\r\n");
 
@@ -93,7 +91,7 @@ int main(void)
      * Set timer period.
      * Note : the parameter "ticks" of LPTMR_SetTimerPeriod should be equal or greater than 1.
      */
-    LPTMR_SetTimerPeriod(DEMO_LPTMR_BASE, 0x003C);
+    LPTMR_SetTimerPeriod(DEMO_LPTMR_BASE, EXECUTION_TIME_PERIOD);
 
     /* Enable timer interrupt */
     LPTMR_EnableInterrupts(DEMO_LPTMR_BASE, kLPTMR_TimerInterruptEnable);
@@ -107,7 +105,8 @@ int main(void)
 	{
 		if((CoreMark_RUN) && (saveFlag == 0))
 		{
-
+			GPIO_PinWrite(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN, LOGIC_LED_OFF);
+			GPIO_PinWrite(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PIN, LOGIC_LED_ON);
 			PRINTF("Ejecutando\r\n");
 
 			(void)temperature_getValue();
@@ -123,9 +122,9 @@ int main(void)
 		else if (saveFlag != 0)
 		{
 			PRINTF("Memoria Llena\r\n");
+			GPIO_PinWrite(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PIN, LOGIC_LED_OFF);
+			GPIO_PinWrite(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN, LOGIC_LED_ON);
 		}
-
-//		ch = GETCHAR();
-//		PUTCHAR(ch);
 	}
+#endif
 }

@@ -14,12 +14,12 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define FLASH_USER_START  		(0x0001E010)
+#define FLASH_USER_START  		(0x0000C010)
 #define FLASH_USER_END   		(0x0001FFFF)
 
 #define FLASH_16BYTE_LENGTH		(16U)
 
-#define FLASH_ERASE_START 		(0x0001E000)
+#define FLASH_ERASE_START 		(0x0000C000)
 #define FLASH_ERASE_FLAG		(0xC52)
 /*******************************************************************************
  * types
@@ -66,8 +66,8 @@ static void FlashData_s_vEraseSector(void)
 	status_t status;
 	uint32_t erase_flag = FLASH_ERASE_FLAG;
 
-	FLASH_API->flash_erase_sector(&s_flashDriver, FLASH_ERASE_START, 8192, kFLASH_ApiEraseKey);
-	status = FLASH_API->flash_verify_erase_sector(&s_flashDriver, FLASH_ERASE_START, 8192);
+	FLASH_API->flash_erase_sector(&s_flashDriver, FLASH_ERASE_START, 81920, kFLASH_ApiEraseKey);
+	status = FLASH_API->flash_verify_erase_sector(&s_flashDriver, FLASH_ERASE_START, 81920);
 	if(status != kStatus_Success)
 	{
 		error_trap();
