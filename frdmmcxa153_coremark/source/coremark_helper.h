@@ -20,20 +20,20 @@
 /* Structure to save data in non-volatile memory*/
 typedef struct
 {
-	uint8_t 	StartMsg[8];
-	uint32_t 	Temperature;
-	uint32_t 	CoreMarkSize;
-	uint32_t 	TotalTicks;
-	uint32_t 	TotalTime;
-	uint32_t	IterationsPerSec;
-	uint32_t	Iterations;
+	uint8_t 	StartMsg[8];			/*Caracteres para indicar el inicio de una prueba en memoria.*/
+	uint32_t 	Temperature;			/*Lectura del sensor de temperatura de la tarjeta.*/
+	uint32_t 	CoreMarkSize;			/*Tamaño de los datos de la prueba.*/
+	uint32_t 	TotalTicks;				/*Total de ticks de ejecución de la prueba.*/
+	uint32_t 	TotalTime;				/*Total de segundos de ejecución de la prueba.*/
+	uint32_t	IterationsPerSec;		/*Iteraciones por segundo.*/
+	uint32_t	Iterations;				/*Número de iteraciones de ejecución.*/
 	uint16_t 	SeedCrc;
 	uint16_t	CrcList;
 	uint16_t	CrcMatrix;
 	uint16_t 	CrcState;
 	uint16_t 	CrcFinal;
 	uint16_t 	NumErrors;
-	uint8_t		EndMsg[4];
+	uint8_t		EndMsg[4];				/*Caracteres para indicar el fin de una prueba en memoria.*/
 }RESULTS_FLASH;
 /*******************************************************************************
  * Variables

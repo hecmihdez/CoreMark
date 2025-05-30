@@ -75,7 +75,6 @@ void CMHELPER_RunCoremark(RESULTS_FLASH* test_results) {
 static void CMHELPER_TimerInit(void) {
 
       /* Board pin, clock, debug console init */
-//     CLOCK_EnableClock(kCLOCK_Tstmr0);
 	OSTIMER_Init(CMHELPER_TIMER_BASE);
 }
 
@@ -97,7 +96,6 @@ static void CMHELPER_PrintDebugInfo(void) {
  */
 uint32_t CMHELPER_TimerGetCount(void) {
 #if (defined(POWER_MEASURE_EN) && (POWER_MEASURE_EN==0))
-//    return (uint32_t)(TSTMR_ReadTimeStamp(CMHELPER_TIMER_BASE));
     return (uint32_t)(OSTIMER_GetCurrentTimerValue(CMHELPER_TIMER_BASE));
 #else
     return 0;

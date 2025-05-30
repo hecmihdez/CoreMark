@@ -122,9 +122,6 @@ void portable_fini(core_portable *p)
 //          ee_printf("PMECTR3_LO = 0x%08x\n\n\n\r",SYSPM->PMCR[0].PMECTR[2].LO);
           
    //       ee_printf("\n\nERM_CORR_ERR_CNT1 = 0x%08x\n\n\n\r",ERM0->CORR_ERR_CNT1);
-          
-
-        
 }
 
 

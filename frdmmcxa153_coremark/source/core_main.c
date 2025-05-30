@@ -364,8 +364,6 @@ MAIN_RETURN_TYPE coremark_main(RESULTS_FLASH* test_results) {
 #if HAS_FLOAT
 		if (known_id==3) {
 			ee_printf("CoreMark 1.0 : %f / %s %s",default_num_contexts*results[0].iterations/time_in_secs(total_time),COMPILER_VERSION,COMPILER_FLAGS);
-//			ee_printf("CoreMark 1.0 : / %s %s\n\r",COMPILER_VERSION,COMPILER_FLAGS);
-//			ee_printf("CoreMark 1.0 : %f",default_num_contexts*results[0].iterations/time_in_secs(total_time));
 #if defined(MEM_LOCATION) && !defined(MEM_LOCATION_UNSPEC)
 			ee_printf(" / %s",MEM_LOCATION);
 #else
@@ -393,7 +391,7 @@ MAIN_RETURN_TYPE coremark_main(RESULTS_FLASH* test_results) {
 	/* And last call any target specific code for finalizing */
 //	portable_fini(&(results[0].port));
 
-        ee_printf("Coremark execution compleded! \n\r");
+        ee_printf("Coremark execution completed! \n\r");
       
         return MAIN_RETURN_VAL;	
 }

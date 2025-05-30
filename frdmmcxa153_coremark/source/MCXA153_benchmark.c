@@ -14,17 +14,15 @@
 #include "temperature.h"
 #include "Flash_data.h"
 #include "fsl_lptmr.h"
+#include "MCXA153_benchmark_cfg.h"
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define DEMO_LPTMR_BASE    LPTMR0
-#define DEMO_LPTMR_IRQn    LPTMR0_IRQn
+#define LPTMR_BASE    		 LPTMR0
+#define LPTMR_IRQn    		 LPTMR0_IRQn
 #define LPTMR_TIMER_HANDLER  LPTMR0_IRQHandler
 
-#define EXECUTION_TIME_PERIOD	(0x003C)
-
-#define CLEAN_MEMORY	(0)
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -32,17 +30,17 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+static RESULTS_FLASH CoreMark_Results = {"**START*",0,0,0,0,0,0,0,0,0,0,0,0,"END*"};
+static bool CoreMark_RUN = false;
+static int8_t saveFlag = 0;
 signed short total_errors = 0;
-RESULTS_FLASH CoreMark_Results = {"**START*",0,0,0,0,0,0,0,0,0,0,0,0,"END*"};
-bool CoreMark_RUN = false;
-int8_t saveFlag = 0;
 /*******************************************************************************
  * Code
  ******************************************************************************/
 
 void LPTMR_TIMER_HANDLER(void)
 {
-    LPTMR_ClearStatusFlags(DEMO_LPTMR_BASE, kLPTMR_TimerCompareFlag);
+    LPTMR_ClearStatusFlags(LPTMR_BASE, kLPTMR_TimerCompareFlag);
     CoreMark_RUN = true;
 }
 
@@ -52,13 +50,13 @@ void LPTMR_TIMER_HANDLER(void)
  */
 int main(void)
 {
-    char ch;
     lptmr_config_t lptmrConfig;
 
     /* Init board hardware. */
     BOARD_InitHardware();
 
     FlashData_vInit();
+
 #if CLEAN_MEMORY
     FlashData_vEraseSector();
     while(1);
@@ -85,21 +83,20 @@ int main(void)
     lptmrConfig.value = kLPTMR_Prescale_Glitch_13;
 
     /* Initialize the LPTMR */
-    LPTMR_Init(DEMO_LPTMR_BASE, &lptmrConfig);
+    LPTMR_Init(LPTMR_BASE, &lptmrConfig);
 
-    /*
-     * Set timer period.
+    /* Set timer period.
      * Note : the parameter "ticks" of LPTMR_SetTimerPeriod should be equal or greater than 1.
      */
-    LPTMR_SetTimerPeriod(DEMO_LPTMR_BASE, EXECUTION_TIME_PERIOD);
+    LPTMR_SetTimerPeriod(LPTMR_BASE, EXECUTION_TIME_FREQ);
 
     /* Enable timer interrupt */
-    LPTMR_EnableInterrupts(DEMO_LPTMR_BASE, kLPTMR_TimerInterruptEnable);
+    LPTMR_EnableInterrupts(LPTMR_BASE, kLPTMR_TimerInterruptEnable);
 
     /* Enable at the NVIC */
-    EnableIRQ(DEMO_LPTMR_IRQn);
+    EnableIRQ(LPTMR_IRQn);
 
-    LPTMR_StartTimer(DEMO_LPTMR_BASE);
+    LPTMR_StartTimer(LPTMR_BASE);
 
 	while(1)
 	{
@@ -117,7 +114,7 @@ int main(void)
 
 			CoreMark_RUN = false;
 
-			PRINTF("LISTO\r\n");
+			PRINTF("Prueba finalizada\r\n");
 		}
 		else if (saveFlag != 0)
 		{
